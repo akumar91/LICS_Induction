@@ -1,0 +1,64 @@
+Variables: 
+	// Variables for lights in directions
+	// lns: light in north-south direction
+	// lsn: light in south-north direction
+	// lew: light in east-west direction
+	lns, lsn, lew
+
+	// Variables for requests in directions
+	rns, rsn, rew
+
+	// Variables for sensors in directions
+	sns, ssn, sew
+Initial state:
+	sns_0 & ssn_0 & sew_0
+Constraints:
+	// If sensor detect a car, a request is made
+	!sns | rns
+	!ssn | rsn
+	!sew | rew
+
+	// Lights cannot be conflict
+	!(lns & lew)
+	!(lsn & lew)
+
+Transitions:
+	// If the light this step is on and request is true at previous step, 
+	// the request become false this step:
+	!(lns_{k+1} & rns_k) | !rns_{k+1}
+	!(lsn_{k+1} & rsn_k) | !rsn_{k+1}
+	!(lew_{k+1} & rew_k) | !rew_{k+1}
+
+	// If the request is false at previous step, it should also be false this step
+	rns_k | !rns_{k+1}
+	rsn_k | !rsn_{k+1}
+	rew_k | !rew_{k+1}
+
+	// We do not accept new sensor values at later steps
+	// since sensor values are the input of our program
+	!sns_{k+1}
+	!ssn_{k+1}
+	!sew_{k+1}
+
+	// If the light is on at previous step, 
+	// it must become off this step
+	!lns_k | !lns_{k+1}  
+	!lsn_k | !lsn_{k+1}  
+	!lew_k | !lew_{k+1}    
+
+	// If the light is off at this step, and the request is True at previous step
+	// the request should not be changed
+	!(!lns_{k+1} & rns_k) | rns_{k+1}
+	!(!lsn_{k+1} & rsn_k) | rsn_{k+1}
+	!(!lew_{k+1} & rew_k) | rew_{k+1}
+
+Invariants:
+	!(lns & lew)
+	!(lsn & lew)
+
+
+Final state:
+	// All the requests should be cleared or collision detected
+	// (!rns_n & !rsn_n & !rew_n) | (((rns_{n-1} & rns_n) | (rsn_{n-1} & rsn_n)) & !rew_{n-1} & rew_n)
+	//(!rns_n & !rsn_n & !rew_n) | (lns_n & lew_n) | (lsn_n & lew_n)
+	(!rns_n & !rsn_n & !rew_n)

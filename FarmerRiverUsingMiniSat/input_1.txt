@@ -1,0 +1,33 @@
+Variables: 
+	f, w, g, c
+Initial state:
+	f_0 & w_0 & g_0 & c_0
+Constraints:
+	!(w & g & !f)
+	!(!w &  !g & f)
+	!(g & c & !f)
+	!(!g & !c & f)
+Transitions:
+	// The farmer should be crossing
+	!(f_k & f_{k+1}) & !(!f_k & !f_{k+1})
+
+	// goat and wolf cannot be crossing at the same time
+	!(g_k & !g_{k+1} & w_k & !w_{k+1})
+	!(g_k & !g_{k+1} & !w_k & w_{k+1})
+	!(!g_k & g_{k+1} & w_k & !w_{k+1})
+	!(!g_k & g_{k+1} & !w_k & w_{k+1})
+
+	// cabbage and wolf cannot be crossing at the same time
+	!(c_k & !c_{k+1} & w_k & !w_{k+1})
+	!(c_k & !c_{k+1} & !w_k & w_{k+1})
+	!(!c_k & c_{k+1} & w_k & !w_{k+1})
+	!(!c_k & c_{k+1} & !w_k & w_{k+1})
+
+	// cabbage and goat cannot be crossing at the same time
+	!(c_k & !c_{k+1} & g_k & !g_{k+1})
+	!(c_k & !c_{k+1} & !g_k & g_{k+1})
+	!(!c_k & c_{k+1} & g_k & !g_{k+1})
+	!(!c_k & c_{k+1} & !g_k & g_{k+1})	
+
+Final state:
+	!f_n & !w_n & !g_n & !c_n

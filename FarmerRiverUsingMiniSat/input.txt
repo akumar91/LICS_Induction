@@ -1,0 +1,43 @@
+Variables: 
+	// Variables for lights in directions
+	// lns: light in north-south direction
+	// lsn: light in south-north direction
+	// lew: light in east-west direction
+	lns, lsn, lew
+
+	// Variables for sensors in directions
+	sns, ssn, sew
+
+Initial state:
+	sns_0 & ssn_0 & sew_0
+
+Constraints:
+	// Lights cannot be conflict
+	!(lns & lew)
+	!(lsn & lew)
+
+Transitions:
+
+	// If the light is on at previous 2 steps, 
+	// it must become off this step
+	// These constraints corresponds to the maximal 2 seconds of each light
+	// The minimum 1 second is implicit.
+	!(lns_{k-1} & lns_k) | !lns_{k+1}  
+	!(lsn_{k-1} & lsn_k) | !lsn_{k+1}  
+	!(lew_{k-1} & lew_k) | !lew_{k+1}    
+
+	// If light is on, and the sensor is true at previous step, it must become false at this step
+	!(lns_{k+1} & sns_k) | !sns_{k+1}
+	!(lsn_{k+1} & sns_k) | !ssn_{k+1}
+	!(lew_{k+1} & sns_k) | !sew_{k+1}
+
+	// If the light is off at this step, and the sensor is True at previous step
+	// the sensor should not be changed
+	!(!lns_{k+1} & sns_k) | sns_{k+1}
+	!(!lsn_{k+1} & ssn_k) | ssn_{k+1}
+	!(!lew_{k+1} & sew_k) | sew_{k+1}
+
+
+Final state:
+	// Stop when collision happens
+	(lns_n & lew_n) | (lsn_n & lew_n)
